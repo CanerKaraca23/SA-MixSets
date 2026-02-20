@@ -22,6 +22,15 @@ jobs:
       - name: Clone Plugin SDK
         run: git clone --depth 1 https://github.com/DK22Pac/plugin-sdk.git "$env:RUNNER_TEMP\plugin-sdk"
 
+      - name: Create Plugin SDK stub library
+        shell: cmd
+        run: |
+          mkdir "%RUNNER_TEMP%\plugin-sdk\output\lib"
+          echo // empty > "%RUNNER_TEMP%\empty.c"
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
+          cl /c /Fo"%RUNNER_TEMP%\empty.obj" "%RUNNER_TEMP%\empty.c"
+          lib /NOLOGO /OUT:"%RUNNER_TEMP%\plugin-sdk\output\lib\plugin.lib" "%RUNNER_TEMP%\empty.obj"
+
       - name: Build
         run: |
           msbuild MixSets.sln `
