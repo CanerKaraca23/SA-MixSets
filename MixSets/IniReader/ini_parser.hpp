@@ -38,7 +38,6 @@
 #include <sstream>
 #include <fstream>
 
-#include "..\MixSets.h"
 
 namespace linb
 {

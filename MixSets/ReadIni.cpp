@@ -29,7 +29,7 @@ void MixSets::ReadIni_BeforeFirstFrame()
 
 
 	if (ini.data.size() <= 0) {
-		lg << "\nERROR: MixSets.ini not found - MixSets.ini não encontrado \n";
+		lg << "\nERROR: MixSets.ini not found - MixSets.ini nï¿½o encontrado \n";
 		bIniFailed = true;
 		return;
 	} bIniFailed = false;
@@ -43,7 +43,7 @@ void MixSets::ReadIni_BeforeFirstFrame()
 	else {
 		bReadOldINI = true;
 		if (lang == languages::PT)
-			lg << "\n'MixSets old.ini' encontrado. As configurações serão movidas para o 'MixSets.ini'.\n\n";
+			lg << "\n'MixSets old.ini' encontrado. As configuraï¿½ï¿½es serï¿½o movidas para o 'MixSets.ini'.\n\n";
 		else
 			lg << "\n'MixSets old.ini' found. The settings will be moved to 'MixSets.ini'.\n\n";
 	}
@@ -87,7 +87,7 @@ void MixSets::ReadIni_BeforeFirstFrame()
 	if (gameVersion != GAME_10US_COMPACT && gameVersion != GAME_10US_HOODLUM)
 	{
 		if (lang == languages::PT)
-			lg << "\nERROR: O executável do seu jogo não é compatível. Use Crack 1.0 US Hoodlum ou Compact.\n";
+			lg << "\nERROR: O executï¿½vel do seu jogo nï¿½o ï¿½ compatï¿½vel. Use Crack 1.0 US Hoodlum ou Compact.\n";
 		else
 			lg << "\nERROR: Your game executable isn't compatible. Use Crack 1.0 US Hoodlum or Compact.\n";
 		bVersionFailed = true;
@@ -210,7 +210,7 @@ void MixSets::ReadIni_BeforeFirstFrame()
 		}
 		else {
 			if (lang == languages::PT)
-				lg << "\nAVISO: 'FxDistanceMult' não foi ativada pois outro mod alterou o valor.\n";
+				lg << "\nAVISO: 'FxDistanceMult' nï¿½o foi ativada pois outro mod alterou o valor.\n";
 			else
 				lg << "\nWARNING: 'FxDistanceMult' was not activated because another mod changed the value.\n";
 		}
@@ -230,7 +230,7 @@ void MixSets::ReadIni_BeforeFirstFrame()
 				regs.eax = *(uint32_t*)(regs.esi + 0x598);
 
 				CPed* ped = (CPed*)regs.esi;
-				if (ped->m_pIntelligence->m_TaskMgr.FindActiveTaskByType(TASK_COMPLEX_ENTER_CAR_AS_DRIVER) || (ped->m_nPedFlags.bInVehicle && ped->m_pVehicle))
+				if (ped->m_pIntelligence->m_TaskMgr.FindActiveTaskByType(TASK_COMPLEX_ENTER_CAR_AS_DRIVER) || (ped->bInVehicle && ped->m_pVehicle))
 				{
 					if (ped->m_pShadowData)
 					{
@@ -263,13 +263,13 @@ void MixSets::ReadIni_BeforeFirstFrame()
 			uint8_t bShadowNeeded = *(uint8_t*)(regs.esp + 0x80 - 0x6E);
 			CPed* ped = (CPed*)regs.ebp;
 
-			bool showShadow = bShadowNeeded || !ped->m_nPedFlags.bInVehicle;
+			bool showShadow = bShadowNeeded || !ped->bInVehicle;
 
 			if (G_NoStencilShadows && ((g_fx.GetFxQuality() >= 2 && ped->IsPlayer()) || (g_fx.GetFxQuality() >= 3))) {
 				showShadow = false;
 			}
 
-			if (ped->m_nPedFlags.bInVehicle && ped->m_pVehicle)
+			if (ped->bInVehicle && ped->m_pVehicle)
 			{
 				if (G_StaticPedShadOnBike)
 				{
@@ -568,7 +568,7 @@ void MixSets::ReadIni()
 		if (bGunFuncs) {
 			if (lang == languages::PT)
 			{
-				lg << "Fix2DGunflash desativado pois você já está usando a correção de efeito de tiro do GunFuncs." << "\n";
+				lg << "Fix2DGunflash desativado pois vocï¿½ jï¿½ estï¿½ usando a correï¿½ï¿½o de efeito de tiro do GunFuncs." << "\n";
 			}
 			else {
 				lg << "Fix2DGunflash disabled because you are already using gunflash GunFuncs fix." << "\n";
@@ -578,7 +578,7 @@ void MixSets::ReadIni()
 		else if (bIMFX && ReadMemory<uint8_t>(0x73306D, true) == 0x90) {
 			if (lang == languages::PT)
 			{
-				lg << "Fix2DGunflash desativado pois você já está usando a correção de efeito de tiro do IMFX." << "\n";
+				lg << "Fix2DGunflash desativado pois vocï¿½ jï¿½ estï¿½ usando a correï¿½ï¿½o de efeito de tiro do IMFX." << "\n";
 			}
 			else {
 				lg << "Fix2DGunflash disabled because you are already using gunflash IMFX fix." << "\n";
@@ -1024,13 +1024,13 @@ void MixSets::ReadIni()
 	if ((!inSAMP || (inSAMP && rpSAMP)) && ReadIniBool(ini, &lg, "Gameplay", "VehBurnEngineBroke")) {
 		injector::MakeInline<0x006A70ED, 0x006A70F3>([](injector::reg_pack& regs) {
 			auto vehicle = (CVehicle*)regs.esi;
-			vehicle->m_nVehicleFlags.bEngineOn = false;
+			vehicle->bEngineOn = false;
 			regs.eax = *(DWORD*)(regs.esi + 0x57C); //original code
 		});
 
 		injector::MakeInline<0x006A75F9, 0x006A75FF>([](injector::reg_pack& regs) {
 			auto vehicle = (CVehicle*)regs.esi;
-			if (vehicle->m_fHealth > 0.0f) vehicle->m_nVehicleFlags.bEngineOn = true;
+			if (vehicle->m_fHealth > 0.0f) vehicle->bEngineOn = true;
 			*(DWORD*)(regs.esi + 0x57C) = regs.edi; //original code
 		});
 	}
@@ -1113,7 +1113,7 @@ void MixSets::ReadIni()
 				regs.eax = *(uint32_t*)(regs.esi + 0x594); // mov     eax, [esi+594h]
 
 				CVehicle* vehicle = (CVehicle*)regs.esi;
-				if (!vehicle->m_nVehicleFlags.bIsRCVehicle && !(vehicle->m_pDriver && vehicle->m_pDriver->m_nCreatedBy == 2 && vehicle->m_nCreatedBy == eVehicleCreatedBy::MISSION_VEHICLE)) {
+				if (!vehicle->bIsRCVehicle && !(vehicle->m_pDriver && vehicle->m_pDriver->m_nCreatedBy == 2 && vehicle->m_nCreatedBy == eVehicleCreatedBy::MISSION_VEHICLE)) {
 					if (regs.ebx == 51 || regs.ebx == 37) { // explosion or fire
 						if (G_VehExploDamage != -1.0) { // check it because the var may be updated by ini reloading
 							if (regs.ebx == 51) {
@@ -1304,7 +1304,7 @@ void MixSets::ReadIni()
 			WriteMemory<float*>(0x00511DE4, &_flt_2_4, true);
 			WriteMemory<float*>(0x0052227F, &_flt_2_4, true);
 			WriteMemory<float*>(0x0050F022, &_flt_2_4, true);
-			if (ReadMemory<float*>(0x50F048, true) == &CCamera::m_fMouseAccelHorzntl)
+			if (ReadMemory<float*>(0x50F048, true) == &CCamera::m_fMouseAccelHorzntal)
 			{
 				WriteMemory<float*>(0x0050F048, &CCamera::m_fMouseAccelVertical, true);
 				WriteMemory<float*>(0x0050FB28, &CCamera::m_fMouseAccelVertical, true);
@@ -1320,14 +1320,14 @@ void MixSets::ReadIni()
 			WriteMemory<uint16_t>(0x005BC7BC, 0x0, true);
 
 			float hor = 0.0003125f + 0.0003125f / 2.0f;
-			while (hor <= CCamera::m_fMouseAccelHorzntl)
+			while (hor <= CCamera::m_fMouseAccelHorzntal)
 			{
 				hor += (0.005f / 16.0f);
 			}
 			hor -= 0.0003125f / 2.0f;
-			if (hor != CCamera::m_fMouseAccelHorzntl)
+			if (hor != CCamera::m_fMouseAccelHorzntal)
 			{
-				CCamera::m_fMouseAccelHorzntl = hor;
+				CCamera::m_fMouseAccelHorzntal = hor;
 				FrontEndMenuManager.SaveSettings();
 			}
 			hor *= (0.0015f / 0.0025f);
@@ -1543,7 +1543,7 @@ void MixSets::ReadIni()
 		injector::MakeInline<0x692653>([](injector::reg_pack& regs)
 		{
 			CWeaponInfo* weaponInfo = (CWeaponInfo*)regs.eax;
-			if (weaponInfo->m_dwAnimGroup != 29 && weaponInfo->m_dwAnimGroup != 30) {
+			if (weaponInfo->m_nAnimToPlay != 29 && weaponInfo->m_nAnimToPlay != 30) {
 				*(uintptr_t*)(regs.esp - 0x4) = 0x69267B;
 			}
 			else {
@@ -2146,7 +2146,7 @@ void MixSets::ReadIni()
 		if (numOldCfgNotFound > 0)
 		{
 			if (lang == languages::PT)
-				lg << "\nAviso: " << numOldCfgNotFound << " configurações não foram encontradas no .ini antigo. Verifique acima.\n";
+				lg << "\nAviso: " << numOldCfgNotFound << " configuraï¿½ï¿½es nï¿½o foram encontradas no .ini antigo. Verifique acima.\n";
 			else
 				lg << "\nWarning: " << numOldCfgNotFound << " configurations has not found on old ini. Check it above.\n";
 		}
@@ -2159,7 +2159,7 @@ void MixSets::ReadIni()
 		catch (std::filesystem::filesystem_error& e) {
 			if (lang == languages::PT)
 			{
-				lg << "\nERRO: Não foi possível renomear o arquivo 'MixSets old.ini'. Provavelmente você está com o jogo instalado na pasta Arquivos de Programas ou o arquivo está em uso.\n";
+				lg << "\nERRO: Nï¿½o foi possï¿½vel renomear o arquivo 'MixSets old.ini'. Provavelmente vocï¿½ estï¿½ com o jogo instalado na pasta Arquivos de Programas ou o arquivo estï¿½ em uso.\n";
 				lg << "Mova seu jogo para outra pasta para o melhor funcionamento deste e outros mods. Ou verifique o arquivo, tente de novo, renomei-o ou delete-o manualmente.\n";
 			}
 			else {

@@ -3,7 +3,7 @@ Credits for DK22Pac - IMFX
 If you consider fixing something here, you should also consider fixing there: https://github.com/DK22Pac/imfx
 */
 #pragma once
-#include "game_sa\RenderWare.h"
+#include "RenderWare.h"
 
 class IMFX {
 public:

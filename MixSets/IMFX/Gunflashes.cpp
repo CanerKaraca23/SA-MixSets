@@ -174,7 +174,7 @@ void Gunflashes::CreateGunflashEffectsForPed(CPed *ped) {
 				FxSystem_c *gunflashFx = g_fxMan.CreateFxSystem(fxName, &offset, mat, true);
 				//if (MixSets::G_GunflashEmissionMult > -1.0f) gunflashFx->SetRateMult(MixSets::G_GunflashEmissionMult);
                 if (gunflashFx) {
-					if (ped->m_nPedFlags.bInVehicle) gunflashFx->m_pParentMatrix = boneMat;
+					if (ped->bInVehicle) gunflashFx->m_pParentMatrix = boneMat;
                     RwMatrixRotate(&gunflashFx->m_localMatrix, &axis_z, -90.0f, rwCOMBINEPRECONCAT);
                     if (rotate) {
                         RwMatrixRotate(&gunflashFx->m_localMatrix, &axis_y, CGeneral::GetRandomNumberInRange(0.0f, 360.0f), rwCOMBINEPRECONCAT);
