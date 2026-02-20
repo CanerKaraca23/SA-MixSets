@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Clone Plugin SDK
+        run: git clone --depth 1 https://github.com/DK22Pac/plugin-sdk.git "$env:RUNNER_TEMP\plugin-sdk"
+
+      - name: Build
+        run: |
+          msbuild MixSets.sln `
+            /p:Configuration="GTASA Release" `
+            /p:Platform=Win32 `
+            /p:OutDir="$env:GITHUB_WORKSPACE\build\" `
+            /p:PLUGIN_SDK_DIR="$env:RUNNER_TEMP\plugin-sdk"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MixSets
+          path: build/MixSets.asi
+          if-no-files-found: error
