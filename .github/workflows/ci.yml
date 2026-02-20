@@ -22,14 +22,42 @@ jobs:
       - name: Clone Plugin SDK
         run: git clone --depth 1 https://github.com/DK22Pac/plugin-sdk.git "$env:RUNNER_TEMP\plugin-sdk"
 
-      - name: Create Plugin SDK stub library
+      - name: Build Plugin SDK library
         shell: cmd
         run: |
-          mkdir "%RUNNER_TEMP%\plugin-sdk\output\lib"
-          echo // empty > "%RUNNER_TEMP%\empty.c"
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
-          cl /c /Fo"%RUNNER_TEMP%\empty.obj" "%RUNNER_TEMP%\empty.c"
-          lib /NOLOGO /OUT:"%RUNNER_TEMP%\plugin-sdk\output\lib\plugin.lib" "%RUNNER_TEMP%\empty.obj"
+
+          set SDK=%RUNNER_TEMP%\plugin-sdk
+          set OBJDIR=%RUNNER_TEMP%\sdk_obj
+          set OUTLIB=%SDK%\output\lib\plugin.lib
+          mkdir "%SDK%\output\lib"
+          mkdir "%OBJDIR%"
+
+          set CL_OPTS=/c /nologo /W0 /EHsc /MT /std:c++latest /permissive /DGTASA /DRW /DPLUGIN_SGV_10US /D_CRT_SECURE_NO_WARNINGS /D_NDEBUG /DGTAGAME_NAME="San Andreas" /DGTAGAME_ABBR="SA" /DGTAGAME_ABBRLOW="sa" /DGTAGAME_PROTAGONISTNAME="CJ" /DGTAGAME_CITYNAME="San Andreas"
+          set INCLUDES=/I"%SDK%\plugin_sa" /I"%SDK%\plugin_sa\game_sa" /I"%SDK%\plugin_sa\game_sa\rw" /I"%SDK%\shared" /I"%SDK%\shared\game" /I"%SDK%\safetyhook" /I"%SDK%\injector"
+
+          echo Building game_sa sources...
+          for %%f in ("%SDK%\plugin_sa\game_sa\*.cpp") do (
+            cl %CL_OPTS% %INCLUDES% /Fo"%OBJDIR%\%%~nf.obj" "%%f"
+          )
+
+          echo Building shared sources...
+          for %%f in ("%SDK%\shared\*.cpp") do (
+            cl %CL_OPTS% %INCLUDES% /Fo"%OBJDIR%\shared_%%~nf.obj" "%%f"
+          )
+
+          echo Building shared extensions...
+          for %%f in ("%SDK%\shared\extensions\*.cpp") do (
+            cl %CL_OPTS% %INCLUDES% /Fo"%OBJDIR%\ext_%%~nf.obj" "%%f"
+          )
+
+          echo Building safetyhook...
+          cl %CL_OPTS% %INCLUDES% /Fo"%OBJDIR%\safetyhook.obj" "%SDK%\safetyhook\safetyhook.cpp"
+          cl /c /nologo /W0 /MT /D_CRT_SECURE_NO_WARNINGS %INCLUDES% /Fo"%OBJDIR%\Zydis.obj" "%SDK%\safetyhook\Zydis.c"
+
+          echo Creating plugin.lib...
+          lib /NOLOGO /OUT:"%OUTLIB%" "%OBJDIR%\*.obj"
+          echo plugin.lib created successfully.
 
       - name: Build
         run: |
