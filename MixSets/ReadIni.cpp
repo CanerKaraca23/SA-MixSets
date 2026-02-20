@@ -604,13 +604,13 @@ void MixSets::ReadIni()
 				CVector *gunshellPos;
 				CVector gunshellDir;
 
-				//showintlog(weapon->m_nType);
+				//showintlog(weapon->m_eWeaponType);
 				//show3dlog(pointIn->x, 0.0, 0.0);
 
 				float posOffset;
 				float gunshellSize;
 
-				switch (weapon->m_nType)
+				switch (weapon->m_eWeaponType)
 				{
 				case WEAPON_PISTOL:
 				case WEAPON_PISTOL_SILENCED:
@@ -634,7 +634,7 @@ void MixSets::ReadIni()
 				case WEAPON_AK47:
 				case WEAPON_M4:
 				case WEAPON_MINIGUN:
-					weaponInfo = CWeaponInfo::GetWeaponInfo(weapon->m_nType, 1);
+					weaponInfo = CWeaponInfo::GetWeaponInfo(weapon->m_eWeaponType, 1);
 					if (((weaponInfo->m_fAnimLoopEnd - weaponInfo->m_fAnimLoopStart) * 900.0) >= 50 || (*(char*)0xC8A80C += 1, !(*(char*)0xC8A80C & 1)))
 					{
 						posOffset = 0.64999998;

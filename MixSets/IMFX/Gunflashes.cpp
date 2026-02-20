@@ -83,7 +83,7 @@ void Gunflashes::ProcessPerFrame() {
 }
 
 bool __fastcall Gunflashes::MyProcessUseGunTask(CTaskSimpleUseGun *task, int, CPed *ped) {
-    if (task->m_pWeaponInfo == CWeaponInfo::GetWeaponInfo(ped->m_aWeapons[ped->m_nActiveWeaponSlot].m_nType, ped->GetWeaponSkill())) {
+    if (task->m_pWeaponInfo == CWeaponInfo::GetWeaponInfo(ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType, ped->GetWeaponSkill())) {
         if (task->bRightHand) {
             bLeftHand = false;
             CallMethod<0x61EB10>(task, ped, false);
@@ -160,8 +160,8 @@ void Gunflashes::CreateGunflashEffectsForPed(CPed *ped) {
                         break;
                     }
                 }*/
-                char weapSkill = ped->GetWeaponSkill(ped->m_aWeapons[ped->m_nActiveWeaponSlot].m_nType);
-                CWeaponInfo *weapInfo = CWeaponInfo::GetWeaponInfo(ped->m_aWeapons[ped->m_nActiveWeaponSlot].m_nType, weapSkill);
+                char weapSkill = ped->GetWeaponSkill(ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType);
+                CWeaponInfo *weapInfo = CWeaponInfo::GetWeaponInfo(ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType, weapSkill);
                 RwV3d offset = weapInfo->m_vecFireOffset.ToRwV3d();
                 if (leftHand)
                     offset.z *= -1.0f;
