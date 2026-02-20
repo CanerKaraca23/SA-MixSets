@@ -26,7 +26,7 @@ jobs:
         run: |
           msbuild MixSets.sln `
             /p:Configuration="GTASA Release" `
-            /p:Platform=Win32 `
+            /p:Platform=x86 `
             /p:OutDir="$env:GITHUB_WORKSPACE\build\" `
             /p:PLUGIN_SDK_DIR="$env:RUNNER_TEMP\plugin-sdk"
 
