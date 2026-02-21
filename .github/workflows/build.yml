@@ -7,7 +7,7 @@ on:
     branches: [ "master", "main" ]
 
 env:
-  SOLUTION_FILE_PATH: MixSets/MixSets.vcxproj
+  SOLUTION_FILE_PATH: MixSets.sln
   BUILD_CONFIGURATION: GTASA Release
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
 
     - name: Build MixSets
       working-directory: ${{ github.workspace }}
-      run: msbuild /m /p:Configuration="${{ env.BUILD_CONFIGURATION }}" ${{ env.SOLUTION_FILE_PATH }} /p:Platform=Win32 /p:OutDir="${{ github.workspace }}\bin\\" /p:PlatformToolset=v143
+      run: msbuild /m /p:Configuration="${{ env.BUILD_CONFIGURATION }}" ${{ env.SOLUTION_FILE_PATH }} /p:Platform=x86 /p:OutDir="${{ github.workspace }}\bin\\" /p:PlatformToolset=v143
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
