@@ -180,7 +180,7 @@ namespace linb
         }
 
         /* Lookup */
-        size_type count(const string_type& sect)
+        size_type count(const string_type& sect) const
         {
             return data.count(sect);
         }
@@ -188,9 +188,13 @@ namespace linb
         {
             return data.find(sect);
         }
+        const_iterator find(const string_type& sect) const
+        {
+            return data.find(sect);
+        }
 
         /* Gets a value from the specified section & key, default_value is returned if the sect & key doesn't exist */
-        string_type get(const string_type& sect, const key_type& key, const string_type& default_value)
+        string_type get(const string_type& sect, const key_type& key, const string_type& default_value) const
         {
             auto it = this->find(sect);
             if (it != this->end())

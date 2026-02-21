@@ -86,10 +86,10 @@ public:
 	static void SetIdlePriority();
 	static void ProcessUseHighPedShadows();
 	static inline bool FileExists(const string& name);
-	static void ReadOldINI(CIniReader ini, fstream* lg, string section, string key);
-	static bool ReadIniFloat(CIniReader ini, fstream* lg, string section, string key, float* f);
-	static bool ReadIniInt(CIniReader ini, fstream* lg, string section, string key, int* i);
-	static bool ReadIniBool(CIniReader ini, fstream* lg, string section, string key);
+	static void ReadOldINI(const CIniReader& ini, fstream* lg, const string& section, const string& key);
+	static bool ReadIniFloat(const CIniReader& ini, fstream* lg, const string& section, const string& key, float* f);
+	static bool ReadIniInt(const CIniReader& ini, fstream* lg, const string& section, const string& key, int* i);
+	static bool ReadIniBool(const CIniReader& ini, fstream* lg, const string& section, const string& key);
 
 	static bool IncreaseMemoryValueIfValid(uintptr_t address, int32_t value, uint8_t validation, bool vp);
 	static bool IncreaseMemoryValueIfValid_Byte(uintptr_t address, int8_t value, uint8_t validation, bool vp);

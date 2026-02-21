@@ -146,7 +146,7 @@ public:
         return *this == ir;
     }
 
-    const std::string& GetIniPath()
+    const std::string& GetIniPath() const
     {
         return m_szFileName;
     }
@@ -180,18 +180,18 @@ public:
         data.load_file(m_szFileName);
     }
 
-    int ReadInteger(std::string_view szSection, std::string_view szKey, int iDefaultValue)
+    int ReadInteger(std::string_view szSection, std::string_view szKey, int iDefaultValue) const
     {
         auto str = data.get(szSection.data(), szKey.data(), std::to_string(iDefaultValue));
         return std::stoi(str, nullptr, starts_with(str.c_str(), "0x", false) ? 16 : 10);
     }
 
-    float ReadFloat(std::string_view szSection, std::string_view szKey, float fltDefaultValue)
+    float ReadFloat(std::string_view szSection, std::string_view szKey, float fltDefaultValue) const
     {
         return (float)atof(data.get(szSection.data(), szKey.data(), std::to_string(fltDefaultValue)).c_str());
     }
 
-    bool ReadBoolean(std::string_view szSection, std::string_view szKey, bool bolDefaultValue)
+    bool ReadBoolean(std::string_view szSection, std::string_view szKey, bool bolDefaultValue) const
     {
         auto val = data.get(szSection.data(), szKey.data(), "");
         if (!val.empty())
@@ -204,7 +204,7 @@ public:
         return bolDefaultValue;
     }
 
-    std::string ReadString(std::string_view szSection, std::string_view szKey, std::string_view szDefaultValue)
+    std::string ReadString(std::string_view szSection, std::string_view szKey, std::string_view szDefaultValue) const
     {
         auto s = data.get(szSection.data(), szKey.data(), szDefaultValue.data());
 
