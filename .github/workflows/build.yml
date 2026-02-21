@@ -32,7 +32,7 @@ jobs:
 
     - name: Generate plugin-sdk project files
       working-directory: ${{ github.workspace }}\plugin-sdk\tools\premake
-      run: .\premake5.exe vs2019
+      run: .\premake5.exe vs2022
 
     - name: Build plugin-sdk
       working-directory: ${{ github.workspace }}\plugin-sdk
@@ -40,7 +40,7 @@ jobs:
 
     - name: Build MixSets
       working-directory: ${{ github.workspace }}
-      run: msbuild /m /p:Configuration="${{ env.BUILD_CONFIGURATION }}" ${{ env.SOLUTION_FILE_PATH }} /p:Platform=Win32 /p:OutDir="${{ github.workspace }}\bin\\"
+      run: msbuild /m /p:Configuration="${{ env.BUILD_CONFIGURATION }}" ${{ env.SOLUTION_FILE_PATH }} /p:Platform=Win32 /p:OutDir="${{ github.workspace }}\bin\\" /p:PlatformToolset=v143
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
