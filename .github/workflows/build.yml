@@ -36,7 +36,7 @@ jobs:
 
     - name: Build plugin-sdk
       working-directory: ${{ github.workspace }}\plugin-sdk
-      run: msbuild /m /p:Configuration=Release plugin.sln /p:Platform=Win32
+      run: msbuild /m /p:Configuration=Release plugin.sln
 
     - name: Build MixSets
       working-directory: ${{ github.workspace }}
