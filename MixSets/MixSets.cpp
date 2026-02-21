@@ -3,7 +3,6 @@
 */
 #include "MixSets.h"
 #include "ReadIni.h"
-#include "Common.h"
 
 // Game
 #include "extensions/ScriptCommands.h"
