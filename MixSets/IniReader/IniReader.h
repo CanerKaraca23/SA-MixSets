@@ -3,6 +3,7 @@
 #include "ini_parser.hpp"
 #include <string>
 #include <string_view>
+#include <cctype>
 #include <Windows.h>
 
 /*
@@ -23,16 +24,12 @@ inline int strcmp(const char* str1, const char* str2, size_t num, bool csensitiv
 
 inline int compare(const std::string& str1, const std::string& str2, bool case_sensitive)
 {
-    if (str1.length() == str2.length())
-        return strcmp(str1.c_str(), str2.c_str(), case_sensitive);
-    return (str1.length() < str2.length() ? -1 : 1);
+    return strcmp(str1.c_str(), str2.c_str(), case_sensitive);
 }
 
 inline int compare(const std::string& str1, const std::string& str2, size_t num, bool case_sensitive)
 {
-    if (str1.length() == str2.length())
-        return strcmp(str1.c_str(), str2.c_str(), num, case_sensitive);
-    return (str1.length() < str2.length() ? -1 : 1);
+    return strcmp(str1.c_str(), str2.c_str(), num, case_sensitive);
 }
 
 inline int compare(const char* str1, const char* str2, bool case_sensitive)
@@ -62,8 +59,13 @@ inline bool starts_with(const char* str, const char* prefix, bool case_sensitive
 
 inline bool ends_with(const char* str, const char* prefix, bool case_sensitive)
 {
-    auto str2 = &str[strlen(str) - 1];
-    auto prefix2 = &prefix[strlen(prefix) - 1];
+    size_t str_len = strlen(str);
+    size_t prefix_len = strlen(prefix);
+    if (prefix_len > str_len) return false;
+    if (prefix_len == 0) return true;
+
+    auto str2 = &str[str_len - 1];
+    auto prefix2 = &prefix[prefix_len - 1];
 
     while (prefix2 >= prefix)
     {
