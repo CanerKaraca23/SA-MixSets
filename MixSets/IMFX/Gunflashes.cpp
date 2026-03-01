@@ -83,7 +83,7 @@ void Gunflashes::ProcessPerFrame() {
 }
 
 bool __fastcall Gunflashes::MyProcessUseGunTask(CTaskSimpleUseGun *task, int, CPed *ped) {
-    if (task->m_pWeaponInfo == CWeaponInfo::GetWeaponInfo(ped->m_aWeapons[ped->m_nActiveWeaponSlot].m_nType, ped->GetWeaponSkill())) {
+    if (task->m_pWeaponInfo == CWeaponInfo::GetWeaponInfo(ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType, ped->GetWeaponSkill())) {
         if (task->bRightHand) {
             bLeftHand = false;
             CallMethod<0x61EB10>(task, ped, false);
@@ -153,15 +153,15 @@ void Gunflashes::CreateGunflashEffectsForPed(CPed *ped) {
                 bool smoke = true;
                 char *fxName = "gunflash";
                 /*for (GunflashInfo &info : gunflashInfos) {
-                    if (info.weapId == ped->m_aWeapons[ped->m_nActiveWeaponSlot].m_nType) {
+                    if (info.weapId == ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType) {
                         rotate = info.rotate;
                         smoke = info.smoke;
                         fxName = info.fxName;
                         break;
                     }
                 }*/
-                char weapSkill = ped->GetWeaponSkill(ped->m_aWeapons[ped->m_nActiveWeaponSlot].m_nType);
-                CWeaponInfo *weapInfo = CWeaponInfo::GetWeaponInfo(ped->m_aWeapons[ped->m_nActiveWeaponSlot].m_nType, weapSkill);
+                char weapSkill = ped->GetWeaponSkill(ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType);
+                CWeaponInfo *weapInfo = CWeaponInfo::GetWeaponInfo(ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType, weapSkill);
                 RwV3d offset = weapInfo->m_vecFireOffset.ToRwV3d();
                 if (leftHand)
                     offset.z *= -1.0f;
@@ -174,7 +174,7 @@ void Gunflashes::CreateGunflashEffectsForPed(CPed *ped) {
 				FxSystem_c *gunflashFx = g_fxMan.CreateFxSystem(fxName, &offset, mat, true);
 				//if (MixSets::G_GunflashEmissionMult > -1.0f) gunflashFx->SetRateMult(MixSets::G_GunflashEmissionMult);
                 if (gunflashFx) {
-					if (ped->m_nPedFlags.bInVehicle) gunflashFx->m_pParentMatrix = boneMat;
+					if (ped->bInVehicle) gunflashFx->m_pParentMatrix = boneMat;
                     RwMatrixRotate(&gunflashFx->m_localMatrix, &axis_z, -90.0f, rwCOMBINEPRECONCAT);
                     if (rotate) {
                         RwMatrixRotate(&gunflashFx->m_localMatrix, &axis_y, CGeneral::GetRandomNumberInRange(0.0f, 360.0f), rwCOMBINEPRECONCAT);

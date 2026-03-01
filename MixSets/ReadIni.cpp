@@ -230,7 +230,7 @@ void MixSets::ReadIni_BeforeFirstFrame()
 				regs.eax = *(uint32_t*)(regs.esi + 0x598);
 
 				CPed* ped = (CPed*)regs.esi;
-				if (ped->m_pIntelligence->m_TaskMgr.FindActiveTaskByType(TASK_COMPLEX_ENTER_CAR_AS_DRIVER) || (ped->m_nPedFlags.bInVehicle && ped->m_pVehicle))
+				if (ped->m_pIntelligence->m_TaskMgr.FindActiveTaskByType(TASK_COMPLEX_ENTER_CAR_AS_DRIVER) || (ped->bInVehicle && ped->m_pVehicle))
 				{
 					if (ped->m_pShadowData)
 					{
@@ -263,13 +263,13 @@ void MixSets::ReadIni_BeforeFirstFrame()
 			uint8_t bShadowNeeded = *(uint8_t*)(regs.esp + 0x80 - 0x6E);
 			CPed* ped = (CPed*)regs.ebp;
 
-			bool showShadow = bShadowNeeded || !ped->m_nPedFlags.bInVehicle;
+			bool showShadow = bShadowNeeded || !ped->bInVehicle;
 
 			if (G_NoStencilShadows && ((g_fx.GetFxQuality() >= 2 && ped->IsPlayer()) || (g_fx.GetFxQuality() >= 3))) {
 				showShadow = false;
 			}
 
-			if (ped->m_nPedFlags.bInVehicle && ped->m_pVehicle)
+			if (ped->bInVehicle && ped->m_pVehicle)
 			{
 				if (G_StaticPedShadOnBike)
 				{
@@ -604,13 +604,13 @@ void MixSets::ReadIni()
 				CVector *gunshellPos;
 				CVector gunshellDir;
 
-				//showintlog(weapon->m_nType);
+				//showintlog(weapon->m_eWeaponType);
 				//show3dlog(pointIn->x, 0.0, 0.0);
 
 				float posOffset;
 				float gunshellSize;
 
-				switch (weapon->m_nType)
+				switch (weapon->m_eWeaponType)
 				{
 				case WEAPON_PISTOL:
 				case WEAPON_PISTOL_SILENCED:
@@ -634,7 +634,7 @@ void MixSets::ReadIni()
 				case WEAPON_AK47:
 				case WEAPON_M4:
 				case WEAPON_MINIGUN:
-					weaponInfo = CWeaponInfo::GetWeaponInfo(weapon->m_nType, 1);
+					weaponInfo = CWeaponInfo::GetWeaponInfo(weapon->m_eWeaponType, 1);
 					if (((weaponInfo->m_fAnimLoopEnd - weaponInfo->m_fAnimLoopStart) * 900.0) >= 50 || (*(char*)0xC8A80C += 1, !(*(char*)0xC8A80C & 1)))
 					{
 						posOffset = 0.64999998;
@@ -1024,13 +1024,13 @@ void MixSets::ReadIni()
 	if ((!inSAMP || (inSAMP && rpSAMP)) && ReadIniBool(ini, &lg, "Gameplay", "VehBurnEngineBroke")) {
 		injector::MakeInline<0x006A70ED, 0x006A70F3>([](injector::reg_pack& regs) {
 			auto vehicle = (CVehicle*)regs.esi;
-			vehicle->m_nVehicleFlags.bEngineOn = false;
+			vehicle->bEngineOn = false;
 			regs.eax = *(DWORD*)(regs.esi + 0x57C); //original code
 		});
 
 		injector::MakeInline<0x006A75F9, 0x006A75FF>([](injector::reg_pack& regs) {
 			auto vehicle = (CVehicle*)regs.esi;
-			if (vehicle->m_fHealth > 0.0f) vehicle->m_nVehicleFlags.bEngineOn = true;
+			if (vehicle->m_fHealth > 0.0f) vehicle->bEngineOn = true;
 			*(DWORD*)(regs.esi + 0x57C) = regs.edi; //original code
 		});
 	}
@@ -1113,7 +1113,7 @@ void MixSets::ReadIni()
 				regs.eax = *(uint32_t*)(regs.esi + 0x594); // mov     eax, [esi+594h]
 
 				CVehicle* vehicle = (CVehicle*)regs.esi;
-				if (!vehicle->m_nVehicleFlags.bIsRCVehicle && !(vehicle->m_pDriver && vehicle->m_pDriver->m_nCreatedBy == 2 && vehicle->m_nCreatedBy == eVehicleCreatedBy::MISSION_VEHICLE)) {
+				if (!vehicle->bIsRCVehicle && !(vehicle->m_pDriver && vehicle->m_pDriver->m_nCreatedBy == 2 && vehicle->m_nCreatedBy == eVehicleCreatedBy::MISSION_VEHICLE)) {
 					if (regs.ebx == 51 || regs.ebx == 37) { // explosion or fire
 						if (G_VehExploDamage != -1.0) { // check it because the var may be updated by ini reloading
 							if (regs.ebx == 51) {
@@ -1304,7 +1304,7 @@ void MixSets::ReadIni()
 			WriteMemory<float*>(0x00511DE4, &_flt_2_4, true);
 			WriteMemory<float*>(0x0052227F, &_flt_2_4, true);
 			WriteMemory<float*>(0x0050F022, &_flt_2_4, true);
-			if (ReadMemory<float*>(0x50F048, true) == &CCamera::m_fMouseAccelHorzntl)
+			if (ReadMemory<float*>(0x50F048, true) == &CCamera::m_fMouseAccelHorzntal)
 			{
 				WriteMemory<float*>(0x0050F048, &CCamera::m_fMouseAccelVertical, true);
 				WriteMemory<float*>(0x0050FB28, &CCamera::m_fMouseAccelVertical, true);
@@ -1320,14 +1320,14 @@ void MixSets::ReadIni()
 			WriteMemory<uint16_t>(0x005BC7BC, 0x0, true);
 
 			float hor = 0.0003125f + 0.0003125f / 2.0f;
-			while (hor <= CCamera::m_fMouseAccelHorzntl)
+			while (hor <= CCamera::m_fMouseAccelHorzntal)
 			{
 				hor += (0.005f / 16.0f);
 			}
 			hor -= 0.0003125f / 2.0f;
-			if (hor != CCamera::m_fMouseAccelHorzntl)
+			if (hor != CCamera::m_fMouseAccelHorzntal)
 			{
-				CCamera::m_fMouseAccelHorzntl = hor;
+				CCamera::m_fMouseAccelHorzntal = hor;
 				FrontEndMenuManager.SaveSettings();
 			}
 			hor *= (0.0015f / 0.0025f);
@@ -1543,7 +1543,7 @@ void MixSets::ReadIni()
 		injector::MakeInline<0x692653>([](injector::reg_pack& regs)
 		{
 			CWeaponInfo* weaponInfo = (CWeaponInfo*)regs.eax;
-			if (weaponInfo->m_dwAnimGroup != 29 && weaponInfo->m_dwAnimGroup != 30) {
+			if (weaponInfo->m_nAnimToPlay != 29 && weaponInfo->m_nAnimToPlay != 30) {
 				*(uintptr_t*)(regs.esp - 0x4) = 0x69267B;
 			}
 			else {
