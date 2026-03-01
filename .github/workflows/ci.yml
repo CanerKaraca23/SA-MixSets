@@ -48,30 +48,32 @@ jobs:
           mkdir "%SDK%\output\lib"
           mkdir "%OBJDIR%\game_sa" "%OBJDIR%\shared" "%OBJDIR%\shared_game" "%OBJDIR%\shared_ext" "%OBJDIR%\safetyhook"
 
-          set OPTS=/c /nologo /W0 /EHsc /MT /std:c++latest /permissive /MP /DGTASA /DRW /DPLUGIN_SGV_10US /D_CRT_SECURE_NO_WARNINGS /D_NDEBUG
+          set OPTS=/c /nologo /W0 /EHsc /MT /std:c++latest /permissive /DGTASA /DRW /DPLUGIN_SGV_10US /D_CRT_SECURE_NO_WARNINGS /D_NDEBUG
           set INC=/I"%SDK%\plugin_sa" /I"%SDK%\plugin_sa\game_sa" /I"%SDK%\plugin_sa\game_sa\rw" /I"%SDK%\shared" /I"%SDK%\shared\game" /I"%SDK%\safetyhook" /I"%SDK%\injector"
 
-          echo Generating response files...
-          for %%f in (%SDK%\plugin_sa\game_sa\*.cpp) do echo %%f >> "%OBJDIR%\rsp_game_sa.txt"
-          for %%f in (%SDK%\shared\*.cpp) do echo %%f >> "%OBJDIR%\rsp_shared.txt"
-          for %%f in (%SDK%\shared\game\*.cpp) do echo %%f >> "%OBJDIR%\rsp_shared_game.txt"
-          for %%f in (%SDK%\shared\extensions\*.cpp) do echo %%f >> "%OBJDIR%\rsp_shared_ext.txt"
-
           echo Compiling game_sa...
-          cl %OPTS% %INC% /Fo"%OBJDIR%\game_sa\" @"%OBJDIR%\rsp_game_sa.txt"
-          if errorlevel 1 exit /b 1
+          for %%f in ("%SDK%\plugin_sa\game_sa\*.cpp") do (
+            cl %OPTS% %INC% /Fo"%OBJDIR%\game_sa\%%~nf.obj" "%%f"
+            if errorlevel 1 exit /b 1
+          )
 
           echo Compiling shared...
-          cl %OPTS% %INC% /Fo"%OBJDIR%\shared\" @"%OBJDIR%\rsp_shared.txt"
-          if errorlevel 1 exit /b 1
+          for %%f in ("%SDK%\shared\*.cpp") do (
+            cl %OPTS% %INC% /Fo"%OBJDIR%\shared\%%~nf.obj" "%%f"
+            if errorlevel 1 exit /b 1
+          )
 
           echo Compiling shared/game...
-          cl %OPTS% %INC% /Fo"%OBJDIR%\shared_game\" @"%OBJDIR%\rsp_shared_game.txt"
-          if errorlevel 1 exit /b 1
+          for %%f in ("%SDK%\shared\game\*.cpp") do (
+            cl %OPTS% %INC% /Fo"%OBJDIR%\shared_game\%%~nf.obj" "%%f"
+            if errorlevel 1 exit /b 1
+          )
 
           echo Compiling shared/extensions...
-          cl %OPTS% %INC% /Fo"%OBJDIR%\shared_ext\" @"%OBJDIR%\rsp_shared_ext.txt"
-          if errorlevel 1 exit /b 1
+          for %%f in ("%SDK%\shared\extensions\*.cpp") do (
+            cl %OPTS% %INC% /Fo"%OBJDIR%\shared_ext\%%~nf.obj" "%%f"
+            if errorlevel 1 exit /b 1
+          )
 
           echo Compiling safetyhook...
           cl %OPTS% %INC% /Fo"%OBJDIR%\safetyhook\safetyhook.obj" "%SDK%\safetyhook\safetyhook.cpp"
