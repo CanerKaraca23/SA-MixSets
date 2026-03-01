@@ -153,7 +153,7 @@ void Gunflashes::CreateGunflashEffectsForPed(CPed *ped) {
                 bool smoke = true;
                 char *fxName = "gunflash";
                 /*for (GunflashInfo &info : gunflashInfos) {
-                    if (info.weapId == ped->m_aWeapons[ped->m_nActiveWeaponSlot].m_nType) {
+                    if (info.weapId == ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType) {
                         rotate = info.rotate;
                         smoke = info.smoke;
                         fxName = info.fxName;
