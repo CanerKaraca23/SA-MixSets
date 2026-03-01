@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: read
     env:
       PLUGIN_SDK_DIR: ${{ github.workspace }}\plugin-sdk
 
@@ -21,15 +23,31 @@ jobs:
         with:
           repository: DK22Pac/plugin-sdk
           path: plugin-sdk
+          fetch-depth: 1
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Get Plugin SDK SHA
+        id: sdk-sha
+        run: |
+          $sha = git -C "$env:PLUGIN_SDK_DIR" rev-parse --short HEAD
+          "sha=$sha" | Out-File -Append $env:GITHUB_OUTPUT
+
+      - name: Cache Plugin SDK library
+        id: cache-sdk
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}\plugin-sdk\output\lib
+          key: plugin-sdk-premake-v143-${{ steps.sdk-sha.outputs.sha }}
+
       - name: Generate plugin-sdk project
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
         shell: cmd
         run: '"%PLUGIN_SDK_DIR%\tools\premake\premake5" vs2022 --file="%PLUGIN_SDK_DIR%\tools\premake\premake5.lua"'
 
       - name: Build plugin-sdk
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
         shell: cmd
         run: msbuild "%PLUGIN_SDK_DIR%\plugin.sln" /p:Configuration=Release /p:Platform="Mixed Platforms" /t:plugin_sa /m
 
@@ -39,7 +57,7 @@ jobs:
             /p:Configuration="GTASA Release" `
             /p:Platform=x86 `
             /p:OutDir="$env:GITHUB_WORKSPACE\build\" `
-            /p:PLUGIN_SDK_DIR="$env:RUNNER_TEMP\plugin-sdk"
+            /p:PLUGIN_SDK_DIR="$env:PLUGIN_SDK_DIR"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
