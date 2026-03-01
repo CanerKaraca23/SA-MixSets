@@ -188,7 +188,7 @@ MixSets::MixSets()
 
 					if (player)
 					{
-						if (player->m_nPedFlags.bInVehicle)
+						if (player->bInVehicle)
 						{
 							bPlayerRenderWeaponInVehicleLastFrame = true;
 							int camMode = TheCamera.m_aCams[0].m_nMode;
@@ -557,7 +557,7 @@ MixSets::MixSets()
 			{
 				if (vehicle->m_nModelIndex == MODEL_TAXI || vehicle->m_nModelIndex == MODEL_CABBIE)
 				{
-					if (vehicle->m_pDriver && vehicle->m_nNumPassengers == 0 && vehicle->m_nVehicleFlags.bEngineOn && vehicle->m_fHealth > 0.0f)
+					if (vehicle->m_pDriver && vehicle->m_nNumPassengers == 0 && vehicle->bEngineOn && vehicle->m_fHealth > 0.0f)
 					{
 						automobile->SetTaxiLight(true);
 					}
@@ -902,7 +902,7 @@ void MixSets::VehFlipDamage_Process(CVehicle* veh)
 		{
 			for (int i = 0; i < 8; ++i)
 			{
-				if (veh->m_apPassengers[i] > 0) MixSets::VehFlipDamage_Process_Damage(veh->m_apPassengers[i]);
+				if (veh->m_apPassengers[i] != nullptr) MixSets::VehFlipDamage_Process_Damage(veh->m_apPassengers[i]);
 			}
 		}
 	}
@@ -916,7 +916,7 @@ void __fastcall PreRender_AddSingleWheelParticles_FixDouble(CVehicle* _this, int
 	//3 = rear right
 	//5 = rear m left
 	//6 = rear m right
-	if (_this->m_pHandlingData->m_nModelFlags.m_bDoubleRwheels && (wheelId == 1 || wheelId == 3 || wheelId == 5 || wheelId == 6))
+	if (_this->m_pHandlingData->m_bDoubleRwheels && (wheelId == 1 || wheelId == 3 || wheelId == 5 || wheelId == 6))
 	{
 		CColPoint *colPoint2 = new CColPoint(*colPoint);
 		float distance = 0.45f;
