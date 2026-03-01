@@ -19,42 +19,13 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      - name: Clone Plugin SDK
-        run: git clone --depth 1 https://github.com/DK22Pac/plugin-sdk.git "$env:RUNNER_TEMP\plugin-sdk"
-
-      - name: Get Plugin SDK SHA
-        id: sdk-sha
-        run: |
-          $sha = git -C "$env:RUNNER_TEMP\plugin-sdk" rev-parse --short HEAD
-          "sha=$sha" | Out-File -Append $env:GITHUB_OUTPUT
-
-      - name: Cache Plugin SDK library
-        id: cache-sdk
-        uses: actions/cache@v4
-        with:
-          path: ${{ runner.temp }}\sdk-lib-cache
-          key: plugin-sdk-premake-v143-${{ steps.sdk-sha.outputs.sha }}
-
-      - name: Generate Plugin SDK project
-        if: steps.cache-sdk.outputs.cache-hit != 'true'
+      - name: Generate plugin-sdk project
         shell: cmd
-        env:
-          PLUGIN_SDK_DIR: ${{ runner.temp }}\plugin-sdk
-        run: '"%RUNNER_TEMP%\plugin-sdk\tools\premake\premake5" vs2022 --file="%RUNNER_TEMP%\plugin-sdk\tools\premake\premake5.lua"'
+        run: '"%PLUGIN_SDK_DIR%\tools\premake\premake5" vs2022 --file="%PLUGIN_SDK_DIR%\tools\premake\premake5.lua"'
 
-      - name: Build Plugin SDK
-        if: steps.cache-sdk.outputs.cache-hit != 'true'
+      - name: Build plugin-sdk
         shell: cmd
-        run: |
-          msbuild "%RUNNER_TEMP%\plugin-sdk\plugin.sln" /p:Configuration=Release /p:Platform="Mixed Platforms" /t:plugin_sa /m
-          mkdir "%RUNNER_TEMP%\sdk-lib-cache"
-          copy "%RUNNER_TEMP%\plugin-sdk\output\lib\plugin.lib" "%RUNNER_TEMP%\sdk-lib-cache\"
-
-      - name: Restore cached Plugin SDK library
-        if: steps.cache-sdk.outputs.cache-hit == 'true'
-        run: |
-          New-Item -Force -ItemType Directory "$env:RUNNER_TEMP\plugin-sdk\output\lib" | Out-Null
-          Copy-Item "$env:RUNNER_TEMP\sdk-lib-cache\plugin.lib" "$env:RUNNER_TEMP\plugin-sdk\output\lib\"
+        run: msbuild "%PLUGIN_SDK_DIR%\plugin.sln" /p:Configuration=Release /p:Platform="Mixed Platforms" /t:plugin_sa /m
 
       - name: Build
         run: |
