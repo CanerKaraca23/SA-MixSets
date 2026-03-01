@@ -52,10 +52,10 @@ jobs:
           set INC=/I"%SDK%\plugin_sa" /I"%SDK%\plugin_sa\game_sa" /I"%SDK%\plugin_sa\game_sa\rw" /I"%SDK%\shared" /I"%SDK%\shared\game" /I"%SDK%\safetyhook" /I"%SDK%\injector"
 
           echo Generating response files...
-          for %%f in ("%SDK%\plugin_sa\game_sa\*.cpp") do echo "%%f" >> "%OBJDIR%\rsp_game_sa.txt"
-          for %%f in ("%SDK%\shared\*.cpp") do echo "%%f" >> "%OBJDIR%\rsp_shared.txt"
-          for %%f in ("%SDK%\shared\game\*.cpp") do echo "%%f" >> "%OBJDIR%\rsp_shared_game.txt"
-          for %%f in ("%SDK%\shared\extensions\*.cpp") do echo "%%f" >> "%OBJDIR%\rsp_shared_ext.txt"
+          for %%f in (%SDK%\plugin_sa\game_sa\*.cpp) do echo %%f >> "%OBJDIR%\rsp_game_sa.txt"
+          for %%f in (%SDK%\shared\*.cpp) do echo %%f >> "%OBJDIR%\rsp_shared.txt"
+          for %%f in (%SDK%\shared\game\*.cpp) do echo %%f >> "%OBJDIR%\rsp_shared_game.txt"
+          for %%f in (%SDK%\shared\extensions\*.cpp) do echo %%f >> "%OBJDIR%\rsp_shared_ext.txt"
 
           echo Compiling game_sa...
           cl %OPTS% %INC% /Fo"%OBJDIR%\game_sa\" @"%OBJDIR%\rsp_game_sa.txt"
