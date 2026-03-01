@@ -9,8 +9,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    permissions:
-      contents: read
+    env:
+      PLUGIN_SDK_DIR: ${{ github.workspace }}\plugin-sdk
 
     steps:
       - name: Checkout repository
