@@ -16,6 +16,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout plugin-sdk
+        uses: actions/checkout@v4
+        with:
+          repository: DK22Pac/plugin-sdk
+          path: plugin-sdk
+
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
