@@ -33,61 +33,20 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}\sdk-lib-cache
-          key: plugin-sdk-x86-v143-${{ steps.sdk-sha.outputs.sha }}
+          key: plugin-sdk-premake-v143-${{ steps.sdk-sha.outputs.sha }}
 
-      - name: Build Plugin SDK library
+      - name: Generate Plugin SDK project
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: '"%RUNNER_TEMP%\plugin-sdk\tools\premake\premake5" vs2022 --file="%RUNNER_TEMP%\plugin-sdk\tools\premake\premake5.lua"'
+
+      - name: Build Plugin SDK
         if: steps.cache-sdk.outputs.cache-hit != 'true'
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
-
-          set SDK=%RUNNER_TEMP%\plugin-sdk
-          set OBJDIR=%RUNNER_TEMP%\sdk_obj
-          set OUTLIB=%SDK%\output\lib\plugin.lib
-
-          mkdir "%SDK%\output\lib"
-          mkdir "%OBJDIR%\game_sa" "%OBJDIR%\shared" "%OBJDIR%\shared_game" "%OBJDIR%\shared_ext" "%OBJDIR%\safetyhook"
-
-          set OPTS=/c /nologo /W0 /EHsc /MT /std:c++latest /permissive /DGTASA /DRW /DPLUGIN_SGV_10US /D_CRT_SECURE_NO_WARNINGS /D_NDEBUG
-          set INC=/I"%SDK%\plugin_sa" /I"%SDK%\plugin_sa\game_sa" /I"%SDK%\plugin_sa\game_sa\rw" /I"%SDK%\shared" /I"%SDK%\shared\game" /I"%SDK%\safetyhook" /I"%SDK%\injector"
-
-          echo Compiling game_sa...
-          for %%f in ("%SDK%\plugin_sa\game_sa\*.cpp") do (
-            cl %OPTS% %INC% /Fo"%OBJDIR%\game_sa\%%~nf.obj" "%%f"
-            if errorlevel 1 exit /b 1
-          )
-
-          echo Compiling shared...
-          for %%f in ("%SDK%\shared\*.cpp") do (
-            cl %OPTS% %INC% /Fo"%OBJDIR%\shared\%%~nf.obj" "%%f"
-            if errorlevel 1 exit /b 1
-          )
-
-          echo Compiling shared/game...
-          for %%f in ("%SDK%\shared\game\*.cpp") do (
-            cl %OPTS% %INC% /Fo"%OBJDIR%\shared_game\%%~nf.obj" "%%f"
-            if errorlevel 1 exit /b 1
-          )
-
-          echo Compiling shared/extensions...
-          for %%f in ("%SDK%\shared\extensions\*.cpp") do (
-            cl %OPTS% %INC% /Fo"%OBJDIR%\shared_ext\%%~nf.obj" "%%f"
-            if errorlevel 1 exit /b 1
-          )
-
-          echo Compiling safetyhook...
-          cl %OPTS% %INC% /Fo"%OBJDIR%\safetyhook\safetyhook.obj" "%SDK%\safetyhook\safetyhook.cpp"
-          if errorlevel 1 exit /b 1
-          cl /c /nologo /W0 /MT %INC% /Fo"%OBJDIR%\safetyhook\Zydis.obj" "%SDK%\safetyhook\Zydis.c"
-          if errorlevel 1 exit /b 1
-
-          echo Creating plugin.lib...
-          lib /NOLOGO /OUT:"%OUTLIB%" "%OBJDIR%\game_sa\*.obj" "%OBJDIR%\shared\*.obj" "%OBJDIR%\shared_game\*.obj" "%OBJDIR%\shared_ext\*.obj" "%OBJDIR%\safetyhook\*.obj"
-          if errorlevel 1 exit /b 1
-
+          msbuild "%RUNNER_TEMP%\plugin-sdk\plugin.sln" /p:Configuration=Release /p:Platform="Mixed Platforms" /t:plugin_sa /m
           mkdir "%RUNNER_TEMP%\sdk-lib-cache"
-          copy "%OUTLIB%" "%RUNNER_TEMP%\sdk-lib-cache\"
-          echo plugin.lib built and cached.
+          copy "%RUNNER_TEMP%\plugin-sdk\output\lib\plugin.lib" "%RUNNER_TEMP%\sdk-lib-cache\"
 
       - name: Restore cached Plugin SDK library
         if: steps.cache-sdk.outputs.cache-hit == 'true'
