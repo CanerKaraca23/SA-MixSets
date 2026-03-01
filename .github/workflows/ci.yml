@@ -38,6 +38,8 @@ jobs:
       - name: Generate Plugin SDK project
         if: steps.cache-sdk.outputs.cache-hit != 'true'
         shell: cmd
+        env:
+          PLUGIN_SDK_DIR: ${{ runner.temp }}\plugin-sdk
         run: '"%RUNNER_TEMP%\plugin-sdk\tools\premake\premake5" vs2022 --file="%RUNNER_TEMP%\plugin-sdk\tools\premake\premake5.lua"'
 
       - name: Build Plugin SDK
