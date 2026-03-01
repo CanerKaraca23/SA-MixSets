@@ -44,7 +44,7 @@ jobs:
       - name: Generate plugin-sdk project
         if: steps.cache-sdk.outputs.cache-hit != 'true'
         shell: cmd
-        run: '"%PLUGIN_SDK_DIR%\tools\premake\premake5" vs2022 --file="%PLUGIN_SDK_DIR%\tools\premake\premake5.lua"'
+        run: "%PLUGIN_SDK_DIR%\tools\premake\premake5" vs2022 --file="%PLUGIN_SDK_DIR%\tools\premake\premake5.lua"
 
       - name: Build plugin-sdk
         if: steps.cache-sdk.outputs.cache-hit != 'true'
