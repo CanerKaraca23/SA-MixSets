@@ -37,64 +37,61 @@ jobs:
 
       - name: Build Plugin SDK library
         if: steps.cache-sdk.outputs.cache-hit != 'true'
-        shell: pwsh
+        shell: cmd
         run: |
-          # Set up MSVC x86 environment
-          $vcvars = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
-          cmd /c "`"$vcvars`" x86 >nul 2>&1 && set" | ForEach-Object {
-            if ($_ -match '^([^=]+)=(.*)$') { [Environment]::SetEnvironmentVariable($Matches[1], $Matches[2], 'Process') }
-          }
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
 
-          $SDK    = "$env:RUNNER_TEMP\plugin-sdk"
-          $OBJ    = "$env:RUNNER_TEMP\sdk_obj"
-          $OUTLIB = "$SDK\output\lib\plugin.lib"
-          New-Item -Force -ItemType Directory "$SDK\output\lib", $OBJ | Out-Null
+          set SDK=%RUNNER_TEMP%\plugin-sdk
+          set OBJDIR=%RUNNER_TEMP%\sdk_obj
+          set OUTLIB=%SDK%\output\lib\plugin.lib
 
-          $INC  = "/I`"$SDK\plugin_sa`"", "/I`"$SDK\plugin_sa\game_sa`"", "/I`"$SDK\plugin_sa\game_sa\rw`"", "/I`"$SDK\shared`"", "/I`"$SDK\shared\game`"", "/I`"$SDK\safetyhook`"", "/I`"$SDK\injector`""
-          $OPTS = '/c', '/nologo', '/W0', '/EHsc', '/MT', '/std:c++latest', '/permissive', '/MP', '/DGTASA', '/DRW', '/DPLUGIN_SGV_10US', '/D_CRT_SECURE_NO_WARNINGS', '/D_NDEBUG'
+          mkdir "%SDK%\output\lib"
+          mkdir "%OBJDIR%\game_sa" "%OBJDIR%\shared" "%OBJDIR%\shared_game" "%OBJDIR%\shared_ext" "%OBJDIR%\safetyhook"
 
-          # Compile each source group into its own output subdirectory to avoid name collisions
-          foreach ($group in @(
-            @{ Dir = "$SDK\plugin_sa\game_sa"; Out = "game_sa" },
-            @{ Dir = "$SDK\shared";            Out = "shared" },
-            @{ Dir = "$SDK\shared\game";       Out = "shared_game" },
-            @{ Dir = "$SDK\shared\extensions"; Out = "shared_ext" }
-          )) {
-            $files = (Get-ChildItem $group.Dir -Filter "*.cpp").FullName
-            if ($files.Count -eq 0) { continue }
-            $foDir = New-Item -Force -ItemType Directory "$OBJ\$($group.Out)"
-            $rsp   = "$OBJ\$($group.Out).rsp"
-            $files | Set-Content $rsp
-            Write-Host "Compiling $($files.Count) files from $($group.Dir)..."
-            & cl.exe @OPTS @INC "/Fo$foDir\" "@$rsp"
-            if ($LASTEXITCODE -ne 0) { throw "Compilation failed for $($group.Dir)" }
-          }
+          set OPTS=/c /nologo /W0 /EHsc /MT /std:c++latest /permissive /MP /DGTASA /DRW /DPLUGIN_SGV_10US /D_CRT_SECURE_NO_WARNINGS /D_NDEBUG
+          set INC=/I"%SDK%\plugin_sa" /I"%SDK%\plugin_sa\game_sa" /I"%SDK%\plugin_sa\game_sa\rw" /I"%SDK%\shared" /I"%SDK%\shared\game" /I"%SDK%\safetyhook" /I"%SDK%\injector"
 
-          # safetyhook.cpp (C++)
-          $foSafe = New-Item -Force -ItemType Directory "$OBJ\safetyhook"
-          & cl.exe @OPTS @INC "/Fo$foSafe\" "$SDK\safetyhook\safetyhook.cpp"
-          if ($LASTEXITCODE -ne 0) { throw "safetyhook compilation failed" }
+          echo Generating response files...
+          for %%f in ("%SDK%\plugin_sa\game_sa\*.cpp") do echo "%%f" >> "%OBJDIR%\rsp_game_sa.txt"
+          for %%f in ("%SDK%\shared\*.cpp") do echo "%%f" >> "%OBJDIR%\rsp_shared.txt"
+          for %%f in ("%SDK%\shared\game\*.cpp") do echo "%%f" >> "%OBJDIR%\rsp_shared_game.txt"
+          for %%f in ("%SDK%\shared\extensions\*.cpp") do echo "%%f" >> "%OBJDIR%\rsp_shared_ext.txt"
 
-          # Zydis.c (C — no C++ flags)
-          & cl.exe /c /nologo /W0 /MT @INC "/Fo$foSafe\Zydis.obj" "$SDK\safetyhook\Zydis.c"
-          if ($LASTEXITCODE -ne 0) { throw "Zydis.c compilation failed" }
+          echo Compiling game_sa...
+          cl %OPTS% %INC% /Fo"%OBJDIR%\game_sa\" @"%OBJDIR%\rsp_game_sa.txt"
+          if errorlevel 1 exit /b 1
 
-          # Archive into plugin.lib
-          $objs = (Get-ChildItem $OBJ -Recurse -Filter "*.obj").FullName
-          & lib.exe /NOLOGO "/OUT:$OUTLIB" @objs
-          if ($LASTEXITCODE -ne 0) { throw "lib.exe failed" }
+          echo Compiling shared...
+          cl %OPTS% %INC% /Fo"%OBJDIR%\shared\" @"%OBJDIR%\rsp_shared.txt"
+          if errorlevel 1 exit /b 1
 
-          # Save to cache
-          New-Item -Force -ItemType Directory "$env:RUNNER_TEMP\sdk-lib-cache" | Out-Null
-          Copy-Item $OUTLIB "$env:RUNNER_TEMP\sdk-lib-cache\"
-          Write-Host "plugin.lib built and cached."
+          echo Compiling shared/game...
+          cl %OPTS% %INC% /Fo"%OBJDIR%\shared_game\" @"%OBJDIR%\rsp_shared_game.txt"
+          if errorlevel 1 exit /b 1
+
+          echo Compiling shared/extensions...
+          cl %OPTS% %INC% /Fo"%OBJDIR%\shared_ext\" @"%OBJDIR%\rsp_shared_ext.txt"
+          if errorlevel 1 exit /b 1
+
+          echo Compiling safetyhook...
+          cl %OPTS% %INC% /Fo"%OBJDIR%\safetyhook\safetyhook.obj" "%SDK%\safetyhook\safetyhook.cpp"
+          if errorlevel 1 exit /b 1
+          cl /c /nologo /W0 /MT %INC% /Fo"%OBJDIR%\safetyhook\Zydis.obj" "%SDK%\safetyhook\Zydis.c"
+          if errorlevel 1 exit /b 1
+
+          echo Creating plugin.lib...
+          lib /NOLOGO /OUT:"%OUTLIB%" "%OBJDIR%\game_sa\*.obj" "%OBJDIR%\shared\*.obj" "%OBJDIR%\shared_game\*.obj" "%OBJDIR%\shared_ext\*.obj" "%OBJDIR%\safetyhook\*.obj"
+          if errorlevel 1 exit /b 1
+
+          mkdir "%RUNNER_TEMP%\sdk-lib-cache"
+          copy "%OUTLIB%" "%RUNNER_TEMP%\sdk-lib-cache\"
+          echo plugin.lib built and cached.
 
       - name: Restore cached Plugin SDK library
         if: steps.cache-sdk.outputs.cache-hit == 'true'
         run: |
           New-Item -Force -ItemType Directory "$env:RUNNER_TEMP\plugin-sdk\output\lib" | Out-Null
           Copy-Item "$env:RUNNER_TEMP\sdk-lib-cache\plugin.lib" "$env:RUNNER_TEMP\plugin-sdk\output\lib\"
-          Write-Host "plugin.lib restored from cache."
 
       - name: Build
         run: |
