@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="GTASA Release" />
+    <BuildType Name="GTASA zDebug" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="MixSets/MixSets.vcxproj">
+    <Platform Solution="*|x86" Project="Win32" />
+  </Project>
+</Solution>
