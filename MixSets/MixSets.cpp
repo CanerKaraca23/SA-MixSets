@@ -130,7 +130,7 @@ MixSets::MixSets()
 
 		if (bEnabled) {
 			if (lang == languages::PT)
-				lg << "\n" << "Terminado de ler o ini na inicialização do jogo" << "\n\n";
+				lg << "\n" << "Terminado de ler o ini na inicializaï¿½ï¿½o do jogo" << "\n\n";
 			else
 				lg << "\n" << "Done read ini on game init" << "\n\n";
 		}
@@ -745,7 +745,7 @@ void MixSets::ReadOldINI(CIniReader ini, fstream* lg, string section, string key
 	if (oldIniLine.length() <= 0)
 	{
 		if (MixSets::lang == languages::PT)
-			*lg << "Aviso: " << section << ": " << key << " não encontrado no 'MixSets old.ini'. Se não é função nova, então o nome foi alterado na nova versão. Verifique.\n";
+			*lg << "Aviso: " << section << ": " << key << " nï¿½o encontrado no 'MixSets old.ini'. Se nï¿½o ï¿½ funï¿½ï¿½o nova, entï¿½o o nome foi alterado na nova versï¿½o. Verifique.\n";
 		else
 			*lg << "Warning: " << section << ": " << key << " not found in 'MixSets old.ini'. If isn't new feature, then the name has changed in new version. Check it.\n";
 
@@ -938,11 +938,11 @@ void __fastcall PreRender_AddSingleWheelParticles_FixDouble(CVehicle* _this, int
 		pos1.y = from->y;
 		pos1.z = from->z;
 
-		CMatrixLink* matrix = _this->GetMatrix();
+		CMatrixLink& matrix = _this->GetMatrix();
 
-		pos1.x = matrix->right.x * distance;
-		pos1.y = matrix->right.y * distance;
-		pos1.z = matrix->right.z * distance;
+		pos1.x = matrix.right.x * distance;
+		pos1.y = matrix.right.y * distance;
+		pos1.z = matrix.right.z * distance;
 
 		colPoint2->m_vecPoint.x = pos1.x;
 		colPoint2->m_vecPoint.y = pos1.y;

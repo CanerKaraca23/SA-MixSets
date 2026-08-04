@@ -114,7 +114,7 @@ void __fastcall Gunflashes::MyTriggerGunflash(Fx_c *fx, int, CEntity *entity, CV
         pedExt.Get(owner).bInVehicle = bVehicleGunflash;
     }
     else {
-        if (DistanceBetweenPoints(target, origin) > 0.0f) {
+        if (CVector::Distance(target, origin) > 0.0f) {
             RwMatrix fxMat;
             fx->CreateMatFromVec(&fxMat, &origin, &target);
             RwV3d offset = { 0.0f, 0.0f, 0.0f };
@@ -162,7 +162,7 @@ void Gunflashes::CreateGunflashEffectsForPed(CPed *ped) {
                 }*/
                 char weapSkill = ped->GetWeaponSkill(ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType);
                 CWeaponInfo *weapInfo = CWeaponInfo::GetWeaponInfo(ped->m_aWeapons[ped->m_nSelectedWepSlot].m_eWeaponType, weapSkill);
-                RwV3d offset = weapInfo->m_vecFireOffset.ToRwV3d();
+                RwV3d offset = weapInfo->m_vecFireOffset;
                 if (leftHand)
                     offset.z *= -1.0f;
                 static RwV3d axis_y = { 0.0f, 1.0f, 0.0f };
