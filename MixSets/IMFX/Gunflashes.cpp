@@ -103,10 +103,13 @@ bool __fastcall Gunflashes::MyProcessUseGunTask(CTaskSimpleUseGun *task, int, CP
 void __fastcall Gunflashes::DoDriveByGunflash(CPed *driver, int, int, bool leftHand) {
     bLeftHand = leftHand;
     bVehicleGunflash = true;
-    MyTriggerGunflash(&g_fx, 0, driver, CVector(0.0f, 0.0f, 0.0f), CVector(0.0f, 0.0f, 0.0f), true);
+    CVector origin(0.0f, 0.0f, 0.0f);
+    CVector target(0.0f, 0.0f, 0.0f);
+    MyTriggerGunflash(&g_fx, 0, driver, origin, target, true);
 }
 
 void __fastcall Gunflashes::MyTriggerGunflash(Fx_c *fx, int, CEntity *entity, CVector &origin, CVector &target, bool doGunflash) {
+    (void)doGunflash;
     if (entity && entity->m_nType == ENTITY_TYPE_PED) {
         CPed *owner = reinterpret_cast<CPed *>(entity);
         pedExt.Get(owner).bLeftHandGunflashThisFrame = bLeftHand;
@@ -139,7 +142,6 @@ void Gunflashes::CreateGunflashEffectsForPed(CPed *ped) {
     bool ary[2];
     ary[0] = pedExt.Get(ped).bLeftHandGunflashThisFrame;
     ary[1] = pedExt.Get(ped).bRightHandGunflashThisFrame;
-    bool inVehicle = pedExt.Get(ped).bInVehicle;
     for (int i = 0; i < 2; i++) {
         if (ary[i]) {
 
